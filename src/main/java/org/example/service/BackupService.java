@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 
 public class BackupService {
 
+//    Metodo que guarda el archivo orginal antes de editarlo
     public static void backup(File file) throws IOException {
 
         File backupFolder = new File("C:/DicomBackups");

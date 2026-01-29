@@ -20,6 +20,7 @@ public class DicomService {
         return updateField(folder, DicomField.PATIENT_ID, value);
     }
 
+//    Actualizamos la imagen con el valor que queremos y el tag
     public List<String> updateField(File folder, DicomField field, String value) {
 
         List<String> logs = new ArrayList<>();
@@ -39,6 +40,7 @@ public class DicomService {
             if (!file.isFile()) continue;
             try {
                 if (!DicomUtils.isDicom(file)) continue;
+//                Hacemos backeup del archivo original antes de manipularlo
                 BackupService.backup(file);
                 DicomMetadata metadata = DicomUtils.readMetadata(file);
 

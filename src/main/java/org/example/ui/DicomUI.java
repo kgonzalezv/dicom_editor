@@ -92,6 +92,7 @@ public class DicomUI extends JFrame {
     }
 
 
+//    Elige la carpeta donde estan los archivos
     private void chooseFolder() {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -103,6 +104,7 @@ public class DicomUI extends JFrame {
         }
     }
 
+//    Aqui hacemos solo una carga de los datos del primer estudio para verificar
     private void loadPreview() {
         if (selectedFolder == null) {
             showError("Seleccione una carpeta primero");
@@ -132,7 +134,6 @@ public class DicomUI extends JFrame {
 
             accessionField.setText(metadata.getAccessionNumber());
             patientIdField.setText(metadata.getPatientId());
-
             logArea.append("Cargado\n" + metadata);
 
         } catch (Exception e) {
@@ -140,6 +141,7 @@ public class DicomUI extends JFrame {
         }
     }
 
+//    Aplicamos los cambios
     private void applyChanges() {
         if (selectedFolder == null) {
             showError("Seleccione una carpeta primero");
