@@ -107,8 +107,12 @@ public class DicomUI extends JFrame {
         JButton applyBtn = new JButton("Aplicar cambios a toda la carpeta");
         applyBtn.addActionListener(e -> applyChanges());
 
+        JButton clearBtn = new JButton("Limpiar campos y logs");
+        clearBtn.addActionListener(e -> clearFields());
+
         bottomPanel.add(previewBtn);
         bottomPanel.add(applyBtn);
+        bottomPanel.add(clearBtn);
 
         add(bottomPanel, BorderLayout.SOUTH);
     }
@@ -226,6 +230,17 @@ public class DicomUI extends JFrame {
 
     private void setText(JTextField field, Object value) {
         field.setText(value != null ? value.toString() : "");
+    }
+
+    private void clearFields() {
+        setText(accessionField, "");
+        setText(patientIdField, "");
+        setText(patientNameField, "");
+        setText(studyInstanceUIDField, "");
+        setText(randomTag, "");
+        setText(randomTagValue, "");
+        logArea.setText("");
+        DicomUtils.setTagRandom("", "");
     }
 }
 

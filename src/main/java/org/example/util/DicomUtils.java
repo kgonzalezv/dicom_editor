@@ -12,8 +12,6 @@ import java.util.Objects;
 
 public class DicomUtils {
 
-    private static Attributes attrs;
-    private static Attributes fmi;
     private static int tagRandom;
     private static VR vrRandom;
     private static Object tagRandomValue;
@@ -21,6 +19,7 @@ public class DicomUtils {
 
     // Leemos los metadatos DICOM
     public static DicomMetadata readMetadata(File dicomFile) throws Exception {
+        Attributes attrs;
 
         try (DicomInputStream dis = new DicomInputStream(dicomFile)) {
             dis.setIncludeBulkData(DicomInputStream.IncludeBulkData.URI);
@@ -68,6 +67,8 @@ public class DicomUtils {
 
     public static void writeMetadata(File dicomFile, DicomMetadata meta) throws Exception {
 
+        Attributes fmi;
+        Attributes attrs;
         // Leemos el DICOM original
         try (DicomInputStream dis = new DicomInputStream(dicomFile)) {
             dis.setIncludeBulkData(DicomInputStream.IncludeBulkData.URI);
@@ -76,22 +77,25 @@ public class DicomUtils {
         }
 
         // Actualizamos los campos
-        setTag(Tag.AccessionNumber, VR.SH, meta.getAccessionNumber());
-        setTag(Tag.PatientID, VR.LO, meta.getPatientId());
-        setTag(Tag.PatientName, VR.PN, meta.getPatientName());
-        setTag(Tag.StudyInstanceUID, VR.UI, meta.getStudyInstanceUID());
-        setTag(tagRandom, vrRandom, tagRandomValue);
+        setTag(attrs, Tag.AccessionNumber, VR.SH, meta.getAccessionNumber());
+        setTag(attrs, Tag.PatientID, VR.LO, meta.getPatientId());
+        setTag(attrs, Tag.PatientName, VR.PN, meta.getPatientName());
+        setTag(attrs, Tag.StudyInstanceUID, VR.UI, meta.getStudyInstanceUID());
+        setTag(attrs, tagRandom, vrRandom, tagRandomValue);
 
 
         // Archivo temporal
         File tmp = new File(dicomFile.getParent(), dicomFile.getName() + ".tmp");
 
-            // Escribimos en un archivo temporal
+        // Escribimos en un archivo temporal
         try (DicomOutputStream dos = new DicomOutputStream(tmp)) {
-            String tsuid = fmi != null ? fmi.getString(Tag.TransferSyntaxUID) : UID.ImplicitVRLittleEndian;
-            Attributes safeFMI = attrs.createFileMetaInformation(tsuid);
 
-            dos.writeDataset(safeFMI, attrs);
+            if (Objects.isNull(fmi)) {
+                String tsuid = fmi != null ? fmi.getString(Tag.TransferSyntaxUID) : UID.ImplicitVRLittleEndian;
+                fmi = attrs.createFileMetaInformation(tsuid);
+            }
+
+            dos.writeDataset(fmi, attrs);
         }
 
         // Reemplazo final
@@ -102,7 +106,7 @@ public class DicomUtils {
         );
     }
 
-    private static void setTag(int tag, VR vr, Object value) {
+    private static void setTag(Attributes attrs, int tag, VR vr, Object value) {
         if (value == null) return;
 
         if (value instanceof String s) {
