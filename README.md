@@ -6,12 +6,15 @@ Aplicación de escritorio en **Java Swing** para la edición controlada de metad
 - Edición de tags DICOM:
   - Accession Number
   - Patient ID
+  - PatientName
+  - Study Instance UID
+  - Random Tag
 - Procesamiento de **todos los archivos DICOM de una carpeta**
 - Creación automática de **backup** antes de modificar los archivos
 - Interfaz gráfica sencilla desarrollada en **Swing**
 
 ##  Tecnologías
-- Java 8+
+- Java 21
 - Java Swing
 - dcm4che
 - Maven
