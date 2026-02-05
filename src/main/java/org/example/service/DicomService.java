@@ -20,18 +20,31 @@ public class DicomService {
         return updateField(folder, DicomField.PATIENT_ID, value);
     }
 
-//    Actualizamos la imagen con el valor que queremos y el tag
+    public List<String> updatePatientName(File folder, String value) {
+        return updateField(folder, DicomField.PATIENT_NAME, value);
+    }
+
+    public List<String> updateStudyInstanceUID(File folder, String value) {
+        return updateField(folder, DicomField.STUDY_INSTANCE_UID, value);
+    }
+
+    public List<String> updateRandomTag(File folder, String tagName, String value) {
+        DicomUtils.setTagRandom(tagName, value);
+        return updateField(folder, DicomField.RANDOM_TAG, value);
+    }
+
+    //    Actualizamos la imagen con el valor que queremos y el tag
     public List<String> updateField(File folder, DicomField field, String value) {
 
         List<String> logs = new ArrayList<>();
 
-        if (folder == null || !folder.isDirectory()) {
+        if (Objects.isNull(folder) || !folder.isDirectory()) {
             logs.add("Esta carpeta es invalida");
             return logs;
         }
 
         File[] files = folder.listFiles();
-        if (files == null) {
+        if (Objects.isNull(files)) {
             logs.add("La carpeta esta vacia");
             return logs;
         }
@@ -51,7 +64,6 @@ public class DicomService {
 
                 applyChange(metadata, field, value);
                 DicomUtils.writeMetadata(file, metadata);
-
                 logs.add(field + " actualizado en " + file.getName());
 
             } catch (Exception e) {
@@ -62,22 +74,21 @@ public class DicomService {
         return logs;
     }
 
+    // Verificamos si es necesario actualizar el campo
     private boolean needsUpdate(DicomMetadata metadata, DicomField field, String newValue) {
 
-        String currentValue = "";
-
-        switch (field) {
-            case ACCESSION_NUMBER:
-                currentValue = metadata.getAccessionNumber();
-                break;
-            case PATIENT_ID:
-                currentValue = metadata.getPatientId();
-                break;
-        }
+        String currentValue = (String) switch (field) {
+            case ACCESSION_NUMBER -> metadata.getAccessionNumber();
+            case PATIENT_ID -> metadata.getPatientId();
+            case PATIENT_NAME -> metadata.getPatientName();
+            case STUDY_INSTANCE_UID -> metadata.getStudyInstanceUID();
+            case RANDOM_TAG -> metadata.getRandomTagValue();
+        };
 
         return Objects.isNull(currentValue) || !currentValue.equals(newValue);
     }
 
+    // Aplicamos el cambio al metadata
     private void applyChange(DicomMetadata metadata, DicomField field, String value) {
 
         switch (field) {
@@ -86,6 +97,15 @@ public class DicomService {
                 break;
             case PATIENT_ID:
                 metadata.setPatientId(value);
+                break;
+            case PATIENT_NAME:
+                metadata.setPatientName(value);
+                break;
+            case STUDY_INSTANCE_UID:
+                metadata.setStudyInstanceUID(value);
+                break;
+            case RANDOM_TAG:
+                metadata.setRandomTagValue(value);
                 break;
         }
 
